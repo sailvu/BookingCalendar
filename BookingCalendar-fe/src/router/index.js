@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Hello from '@/components/Hello'
+import FrontPage from '@/components/FrontPage'
+import Calendar from '@/components/Calendar'
 import PostsManager from '@/components/PostsManager'
+import Reservations from '@/components/Reservations'
 import Auth from '@okta/okta-vue'
 
 Vue.use(Auth, {
@@ -18,8 +20,24 @@ let router = new Router({
   routes: [
     {
       path: '/',
-      name: 'Hello',
-      component: Hello
+      name: 'FrontPage',
+      component: FrontPage
+    },
+    {
+      path: '/kalenteri',
+      name: 'Calendar',
+      component: Calendar,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/varaukseni',
+      name: 'Reservations',
+      component: Reservations,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/implicit/callback',
