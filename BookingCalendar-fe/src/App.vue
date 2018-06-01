@@ -42,6 +42,7 @@
       },
       async refreshActiveUser() {
         this.activeUser = await this.$auth.getUser();
+        console.log(this.activeUser);
         if (this.activeUser !== undefined) {
           this.$cookie.set("activeUser", JSON.stringify(this.activeUser), 1);
           if (this.$route.path === "/") {

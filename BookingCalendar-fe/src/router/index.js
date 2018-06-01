@@ -8,7 +8,7 @@ import Auth from '@okta/okta-vue'
 Vue.use(Auth, {
   issuer: 'https://dev-853892.oktapreview.com/oauth2/default',
   client_id: '0oaet5au0mgJFXKr90h7',
-  redirect_uri: 'http://104.236.198.128:3000/implicit/callback',
+  redirect_uri: 'http://104.236.198.128/implicit/callback',
   scope: 'openid profile email'
 })
 
@@ -27,7 +27,7 @@ let router = new Router({
       name: 'Calendar',
       component: Calendar,
       meta: {
-        requiresAuth: true
+        // requiresAuth: true
       }
     },
     {

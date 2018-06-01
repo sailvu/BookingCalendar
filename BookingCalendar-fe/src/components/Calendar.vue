@@ -2,12 +2,12 @@
 <template>
   <div class="ml-4 mr-4">
     <div class="m-4" v-if="bookingData !== undefined">
-      <div class="mb-4">
-        <span class="mr-4">Luokka 1 : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.clasroom1}"/></span>
-        <span class="mr-4">Luokka 2 : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.clasroom2}"/></span>
-        <span class="mr-4">Luokka 3 : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.clasroom3}"/></span>
-        <span class="mr-4">Pyhäpäivä : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.exceptionColor}"/></span>
-        <span class="mr-4">Lukukausi : {{formattedTermStart}} - {{formattedTermend}}</span>
+      <div class="d-flex mb-4">
+        <span class="d-flex align-items-center mr-4">Luokka 1 : <div class="box classroom-1 ml-2"></div></span>
+        <span class="d-flex align-items-center mr-4">Luokka 2 : <div class="box classroom-2 ml-2"></div></span>
+        <span class="d-flex align-items-center mr-4">Luokka 3 : <div class="box classroom-3 ml-2"></div></span>
+        <span class="d-flex align-items-center mr-4">Pyhäpäivä : <div class="box exception-color ml-2"></div></span>
+        <span class="mr-4"><b>Lukukausi : {{formattedTermStart}} - {{formattedTermend}}</b></span>
       </div>
       <full-calendar :events="bookingData.bookings" :config="config"></full-calendar>
       <div class="mt-4 w-100 d-flex">
@@ -37,23 +37,17 @@
   import BookingModal from "./BookingModal.vue";
   import {EventBus} from '../shared/event-bus.js';
   import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
-  import { faStop  } from '@fortawesome/fontawesome-free-solid'
 
 
   var cloneDeep = require('clone-deep');
   export default {
     components: {BookingModal, EventBus, FontAwesomeIcon},
     name: 'calendar',
-    computed: {
-      icon () {
-        return faStop
-      }
-    },
     created() {
       this.activeUser = JSON.parse(this.$cookie.get("activeUser"));
       console.log(this.activeUser);
       this.initializeDemoBookings();
-      
+
       let termStartDate = this.bookingsFromDatabase.schoolTerm.startDate;
       let termEndDate = this.bookingsFromDatabase.schoolTerm.endDate;
       this.formattedTermStart =  termStartDate.getDate()+"."+(termStartDate.getMonth()+1)+"."+termStartDate.getFullYear();
@@ -483,6 +477,25 @@
   .btn-primary{
     background-color: #343A40;
     border-color: #343A40;
+  }
+
+  .box{
+    width:15px;
+    height:15px;
+  }
+
+  .classroom-1{
+    background:#d37676;
+  }
+  .classroom-2{
+    background:#5b5fd3;
+  }
+  .classroom-3{
+    background:#00d31c;
+  }
+
+  .exception-color{
+    background:#fcc95a;
   }
 </style>
 
