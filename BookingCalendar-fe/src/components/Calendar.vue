@@ -36,12 +36,10 @@
 <script>
   import BookingModal from "./BookingModal.vue";
   import {EventBus} from '../shared/event-bus.js';
-  import FontAwesomeIcon from '@fortawesome/vue-fontawesome'
-
-
   var cloneDeep = require('clone-deep');
+
   export default {
-    components: {BookingModal, EventBus, FontAwesomeIcon},
+    components: {BookingModal, EventBus},
     name: 'calendar',
     created() {
       this.activeUser = JSON.parse(this.$cookie.get("activeUser"));
