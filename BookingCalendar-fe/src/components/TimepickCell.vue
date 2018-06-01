@@ -44,18 +44,7 @@
     name: "timepick-cell",
     props: ['repeatBooking', 'timeArray', 'dayNo', 'roomNo','date'],
     created(){
-      console.log("timePickCell created");
-      // console.log(this.timeArray);
-      console.log(this.date);
-      // if(this.timeOptions[0].title !== this.defaultOption.title ){
-
-      // }
-
-      console.log("repeatBooking: "+this.repeatBooking);
-      console.log(this.timeArray);
       this.refreshTimeValues();
-
-
     },
     data(){
       return{
@@ -69,36 +58,22 @@
     },
     methods:{
       calculateEndTimes(){
-        console.log("calculating end times");
         let newEndTimes = [];
         // newEndTimes.push
         for(let i in this.timeOptions){
           let time = this.timeOptions[i];
-          console.log(time);
           if(time.time > this.selectedStart.time) {
-            console.log(time.time + " - " + time.disabled);
             newEndTimes.push(time);
             if(time.disabled){
-              console.log("first disabled time found, breaking loop");
               break;
             }
           }
         }
-        console.log("endtimes:");
-        console.log(newEndTimes);
         newEndTimes.unshift(this.defaultOption);
         this.endTimeOptions = newEndTimes;
         this.selectedEnd = this.endTimeOptions[0];
       },
       bookTime(){
-        console.log("trying to book a time");
-        // console.log("dayNo:");
-        // console.log(this.dayNo);
-        // console.log("start:");
-        // console.log(this.selectedStart);
-        // console.log("end");
-        // console.log(this.selectedEnd);
-
           EventBus.$emit("makeBooking",
             this.repeatBooking,
             this.repeatBooking ? this.dayNo + 1 : this.date,
@@ -110,43 +85,28 @@
 
       },
       refreshTimeValues(){
-        console.log("refreshTimeValues");
         this.timeOptions = this.repeatBooking ? cloneDeep(this.timeArray)[this.roomNo][this.dayNo] : this.timeArray;
-        // this.calculateEndTimes();
         this.timeOptions.unshift(this.defaultOption);
-
         this.selectedStart =this.timeOptions[0];
-
         this.selectedEnd = this.endTimeOptions[0];
 
       }
     },
     watch:{
       selectedStart: function(newStart){
-        console.log("selectedstart changed!");
           if(this.selectedStart.title !== this.defaultOption.title) this.calculateEndTimes();
       },
       selectedEnd: function(newStart){
-        console.log("selectedEnd  changed!");
         if(this.selectedEnd.title !== this.defaultOption.title) {
           this.allowBooking = true;
         }else{this.allowBooking = false};
       },
       roomNo: function(){
-        console.log("room no changed!");
         this.refreshTimeValues();
       },
       dayNo: function(){
-        console.log("day no changed!");
         this.refreshTimeValues();
       }
-      // timeOptions: function(newOptions){
-      //   console.log("options changed!");
-      //   this.timeOptions.unshift(this.defaultOption);
-      //   this.selectedStart =this.timeOptions[0];
-      //   this.selectedEnd = this.endTimeOptions[0];
-      // }
-
     }
   }
 </script>

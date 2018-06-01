@@ -7,12 +7,12 @@
         <span class="mr-4">Luokka 2 : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.clasroom2}"/></span>
         <span class="mr-4">Luokka 3 : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.clasroom3}"/></span>
         <span class="mr-4">Pyhäpäivä : <font-awesome-icon :icon="icon" v-bind:style="{'color': eventColours.exceptionColor}"/></span>
+        <span class="mr-4">Lukukausi : {{formattedTermStart}} - {{formattedTermend}}</span>
       </div>
       <full-calendar :events="bookingData.bookings" :config="config"></full-calendar>
       <div class="mt-4 w-100 d-flex">
         <div class="d-flex justify-content-start w-50"><button class="btn-primary p-2" v-on:click="openRepeatableBookingModal()">Lisää toistuva varaus</button></div>
         <div class="d-flex justify-content-end w-50"><button class="btn-primary p-2" v-on:click="openSingleBookingModal()">Lisää yksittäinen varaus</button></div>
-        <!--<button class="btn-primary p-2" v-on:click="testAddingTime2()">test</button>-->
       </div>
     </div>
 
@@ -41,8 +41,6 @@
 
 
   var cloneDeep = require('clone-deep');
-
-
   export default {
     components: {BookingModal, EventBus, FontAwesomeIcon},
     name: 'calendar',
@@ -53,7 +51,13 @@
     },
     created() {
       this.activeUser = JSON.parse(this.$cookie.get("activeUser"));
+      console.log(this.activeUser);
       this.initializeDemoBookings();
+      
+      let termStartDate = this.bookingsFromDatabase.schoolTerm.startDate;
+      let termEndDate = this.bookingsFromDatabase.schoolTerm.endDate;
+      this.formattedTermStart =  termStartDate.getDate()+"."+(termStartDate.getMonth()+1)+"."+termStartDate.getFullYear();
+      this.formattedTermend = termEndDate.getDate()+"."+(termEndDate.getMonth()+1)+"."+termEndDate.getFullYear();
     },
     data() {
       return {
@@ -193,7 +197,7 @@
               // {date: new Date("2018-04-02"), reason: "2. Pääsiäispäivä"},
               // {date: new Date("2018-04-30"), reason: "Vapunaatto"},
               // {date: new Date("2018-05-01"), reason: "Vappu"},
-              {date: new Date("2018-05-10"), reason: "Helatorstai"},
+              // {date: new Date("2018-05-10"), reason: "Helatorstai"},
               {date: new Date("2018-06-22"), reason: "Juhannusaatto"},
             ]
           }
@@ -202,7 +206,6 @@
     },
     methods: {
       openRepeatableBookingModal() {
-        // console.log(this.bookingData);
         this.$modal.show(BookingModal,{
           bookingData: this.bookingData,
           repeatableBooking: true
@@ -212,7 +215,6 @@
         })
       },
       openSingleBookingModal(){
-        console.log("open single booking modal");
         this.$modal.show(BookingModal,{
           bookingData: this.bookingData,
           repeatableBooking: false,
@@ -236,11 +238,7 @@
               let exception = schoolTerm.exceptions[i];
               let exceptionDate = exception.date;
               exceptionDate.setHours(0, 0, 0, 0);
-              // console.log(exceptionDate);
               if (exceptionDate.getTime() === termDate.getTime()) {
-                // console.log("exceptionDate: " + exceptionDate);
-                // console.log("termDate: "+ termDate);
-                // console.log("reason: "+ exception.reason);
 
                 //pushing exception day as a whole day event
                 generatedBookings.push({
@@ -254,7 +252,6 @@
             }
 
             //iterating bookings
-            // console.log(bookings);
             bookingLoop:
               for(let b in bookings){
                 let booking = bookings[b];
@@ -265,7 +262,6 @@
                 let bookingEndHH = Math.floor(booking.endTime);
                 let bookingEndMM = booking.endTime % bookingEndHH * 60;
 
-                // console.log(booking.startTime+ " - " +booking.endTime+" -> "+bookingStartHH+":"+bookingSrartMM+ " - " +bookingEndHH+":"+bookingEndMM);
                 //if booking is repeatable, create events if termDate's weekday matches bookings weekday
                 if(booking.repeatable){
                   let termDay = termDate.getDay();
@@ -303,20 +299,13 @@
                 }
               }
           }
-
-        // console.log("generated "+generatedBookings.length+" bookings");
-        // console.log(generatedBookings);
         return generatedBookings;
 
       },
       refreshAvailableWeeklyTimes(){
-        // console.log("calculating available times");
-        // console.log(bookingData);
-
         var availableTimes = [];
         var bookingsFromDataBase = this.bookingsFromDatabase.bookings;
         var bookingData = this.bookingData;
-        // console.log(bookingsFromDataBase);
 
         //initializing timeSlots
         for(let room = 0; room < bookingData.classrooms.length; room++){
@@ -330,11 +319,6 @@
         //disabling timeslots if old bookings are found
         for(let b in bookingsFromDataBase) {
           let booking = bookingsFromDataBase[b];
-          // let startTime = parseInt(booking.startTime[0]) + parseInt(booking.startTime[1])/60;
-          // let endTime = parseInt(booking.endTime[0]) + parseInt(booking.endTime[1])/60;
-
-          // console.log("startTime: "+startTime);
-          // console.log("endTime: "+endTime);
 
           if (booking.repeatable) {
             this.disableBookedTimes(
@@ -345,52 +329,20 @@
               availableTimes)
           }
         }
-        // console.log("weekly available times:");
-        // console.log(availableTimes);
         this.bookingData.availableTimes =  availableTimes;
       },
       disableBookedTimes(roomNo, weekdays, start, end, availableTimes){
-        // console.log("disabling booked times")
-
         for(let i = 0; i < weekdays.length;i++) {
           let day = weekdays[i];
-          // console.log("weekday: "+day);
           let timeSlots = availableTimes[roomNo-1][day-1];
 
           timeSlots.forEach(function(timeSlot){
-            // console.log(roomNo+" - "+weekdays+" - "+start+" - "+end);
-            // console.log(start+" <= "+ timeSlot.time+ " < "+ end);
-            //
-            // console.log(start <= timeSlot.time);
-            // console.log(timeSlot.time < end);
             if(start <= timeSlot.time && timeSlot.time < end) {
-              // console.log("match!, enabled -> false");
               timeSlot.disabled = true;
-              // console.log(timeSlot);
             }
           })
         }
       },
-      testAddingTime2() {
-        console.log("testAddingtime");
-        var testBooking= [
-          {
-            repeatable: true,
-            weekdays: [1],
-            startTime: ["08","00"],
-            endTime: ["10","15"],
-            exceptions: [
-            ],
-            title: "SampsaVuorela",
-            classroomNo: 1,
-            teacherId: null
-          }];
-
-
-        this.bookingsFromDatabase.bookings = this.bookingsFromDatabase.bookings.concat(testBooking);
-        this.bookingData.bookings = this.generateBookings(this.bookingsFromDatabase);
-      },
-
       getClassRoomColor(classroomNo){
         var color;
         switch(classroomNo){
@@ -411,7 +363,6 @@
       },
 
       initializeDemoBookings(){
-        // console.log("initializing demo bookings");
         var classrooms = [];
         for(var i=1; i<4;i++){
           classrooms.push({id:i, name: "Luokka "+i});
@@ -434,17 +385,7 @@
           timeSlots: timesPerDay
         };
 
-        // console.log("bookingData");
-        // console.log(this.bookingData);
-        // console.log("bookingsFromDatabase:");
-        // console.log(this.bookingsFromDatabase);
-
         this.refreshBookings();
-        // this.bookingData.bookings = this.generateBookings(this.bookingsFromDatabase.bookings);
-        // this.refreshAvailableWeeklyTimes();
-
-        //TODO: remove when ready
-        // this.openRepeatableBookingModal();
       },
 
       calculateTimeSlots(start, end, interval){
@@ -456,7 +397,6 @@
           var hh = Math.floor(start/60); // getting hours of day in 0-24 format
           var mm = (start%60); // getting minutes of the hour in 0-55 format
           let title = ("0" + hh).slice(-2)+":"+ ("0" + mm).slice(-2); // pushing data in array in [00:00 - 12:00 format]
-          // console.log(title);
           let time = hh+(mm/60);
           times[i] = {title:title, time:time, disabled:false};
           start = start + interval;
@@ -476,21 +416,12 @@
           }
         });
         dataBaseBookings.bookings.forEach(function(oldBooking) {
-          // console.log(oldBooking);
-          // console.log("repeatable: "+oldBooking.repeatable+" - " +oldBooking.endTime+" > "+booking.startTime+" || "+oldBooking.startTime+" < "+booking.endTime);
-          // console.log(!oldBooking.repeatable && (oldBooking.endTime > booking.startTime || oldBooking.startTime < booking.endTime));
           if(!oldBooking.repeatable
             && booking.weekdays.indexOf(new Date(oldBooking.date).getDay()) !== -1
             && (oldBooking.endTime > booking.startTime || oldBooking.startTime < booking.endTime)){
-
-            console.log("overlapping booking found!");
-            console.log(oldBooking.date);
-
-
             foundExceptions.push({date: new Date(oldBooking.date), reason: "Varaus: "+oldBooking.title});
           }
         });
-
         return foundExceptions;
       }
     },
@@ -499,7 +430,7 @@
     },
     mounted(){
       EventBus.$on("makeBooking", function (repeatable, day, startTime, endTime, roomNo) {
-        console.log("Calendar.vue: makeRepBookings from eventbus");
+        // console.log("Calendar.vue: makeRepBookings from eventbus");
         // console.log("repatable: "+repeatable);
         // console.log("day: "+day);
         // console.log("startTime:");
@@ -510,8 +441,6 @@
         // console.log("userID: "+this.activeUser.id); //TODO: implement when doing backend
         // console.log(this.activeUser);
         // console.log("roomNo: "+roomNo);
-
-
 
         var booking= {
           repeatable: repeatable,
@@ -531,31 +460,21 @@
         }
 
         this.bookingsFromDatabase.bookings.push(booking);
-        console.log(this.bookingsFromDatabase.bookings);
         this.refreshBookings();
 
         let exceptions = [];
         if(booking.exceptions.length > 0){
-          console.log("exceptions found");
-
           booking.exceptions.forEach(function(exception){
             let e = cloneDeep(exception);
-            e.date = e.date.getDate()+"."+e.date.getMonth()+"."+e.date.getFullYear();
+            e.date = e.date.getDate()+"."+(e.date.getMonth()+1)+"."+e.date.getFullYear();
             exceptions.push(e);
           });
-
-
-
-
         }
         this.exceptionsToShow = exceptions;
         this.$modal.show('exception-modal');
       }.bind(this))
-
     }
   }
-
-
 </script>
 
 <style>
