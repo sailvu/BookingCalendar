@@ -25,7 +25,8 @@
     name: 'app',
     data () {
       return {
-        activeUser: null
+        activeUser: null,
+        userDataLoaded : false
       }
     },
     async created () {
@@ -36,18 +37,29 @@
       '$route': 'refreshActiveUser'
     },
     methods: {
-      login () {
+      login() {
         this.$auth.loginRedirect()
       },
-      async refreshActiveUser () {
-        this.activeUser = await this.$auth.getUser()
-        console.log(this.activeUser)
+      async refreshActiveUser() {
+        this.activeUser = await this.$auth.getUser();
+        if (this.activeUser !== undefined) {
+          this.$cookie.set("activeUser", JSON.stringify(this.activeUser), 1);
+          if (this.$route.path === "/") {
+            this.$router.push("/kalenteri");
+          }
+        }
       },
-      async logout () {
-        await this.$auth.logout()
-        await this.refreshActiveUser()
-        this.$router.push('/')
+      async logout() {
+        await this.$auth.logout();
+        await this.refreshActiveUser();
+        this.$cookie.delete("activeUser");
+        this.$router.push('/');
       }
     }
   }
 </script>
+
+<style>
+  [v-cloak] > * { display:none; }
+  [v-cloak]::before { content: "loading..."; }
+</style>

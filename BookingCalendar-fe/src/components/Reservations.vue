@@ -1,8 +1,11 @@
 /* eslint-disable */
 <template>
-  <modal name="hello-world">
-    hello, world!
-  </modal>
+  <div>
+    <p>Tulee ehkä joskus :)</p>
+    <modal name="hello-world">
+      hello, world!
+    </modal>
+  </div>
 </template>
 
 <script>

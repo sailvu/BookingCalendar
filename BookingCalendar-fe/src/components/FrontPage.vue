@@ -6,7 +6,6 @@
       <p class="lead">
         <a href="#" @click.prevent="login" > Kirjaudu sisään </a> aloittaaksesi
       </p>
-      <button class="btn-default" v-on:click="testMe()">testi</button>
     </div>
   </div>
 </template>
@@ -34,22 +33,10 @@
         test: true
       }
     },
-    async created () {
-      await this.refreshActiveUser()
-    },
     methods: {
       login () {
         this.$auth.loginRedirect()
       },
-      async refreshActiveUser () {
-        this.activeUser = await this.$auth.getUser()
-        console.log(this.activeUser)
-        console.log('acriveuser: \'' + this.activeUser === undefined)
-        if (this.activeUser) this.$router.push('/kalenteri')
-      },
-      testMe () {
-        console.log('halloo?')
-      }
     }
   }
 </script>
